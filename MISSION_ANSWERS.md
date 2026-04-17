@@ -81,20 +81,17 @@ Architecture:
 
 ```text
 Client -> Nginx -> Agent -> Redis
-                     |
-                     -> Qdrant
 ```
 
 - Services started in the advanced stack:
+  - `nginx`
   - `agent`
   - `redis`
-  - `qdrant`
-  - `nginx`
 - Communication:
-  - client reaches Nginx on port 80
+  - client reaches Nginx on the exposed host port
   - Nginx proxies requests to `agent`
   - `agent` uses `redis` for session/rate-limit style storage
-  - `agent` can use `qdrant` as vector store
+  - Nginx can later round-robin requests across multiple `agent` replicas
 
 ## Part 3: Cloud Deployment
 
@@ -188,17 +185,19 @@ Client -> Nginx -> Agent -> Redis
 
 - What I tested:
   - local Docker startup
+  - Nginx reverse proxy in front of the agent
   - health and readiness behavior
   - protected `/ask` endpoint
   - production deployment on Railway
 - What worked:
-  - Docker-based local run
+  - Docker-based local run with `nginx + agent + redis`
   - healthcheck endpoint
   - API key authentication
   - Railway deployment with public URL
 - What still needs improvement:
   - split final app into separate modules such as `auth.py`, `rate_limiter.py`, and `cost_guard.py` to match the ideal project structure exactly
   - add production Redis-backed shared rate limiting if scaling beyond a single instance
+  - fully validate multi-replica load balancing behavior with `docker compose up --scale agent=3`
 
 ## Final Reflection
 

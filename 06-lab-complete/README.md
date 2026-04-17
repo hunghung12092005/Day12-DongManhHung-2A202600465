@@ -5,7 +5,7 @@ Kết hợp TẤT CẢ những gì đã học trong 1 project hoàn chỉnh.
 ## Checklist Deliverable
 
 - [x] Dockerfile (multi-stage, < 500 MB)
-- [x] docker-compose.yml (agent + redis)
+- [x] docker-compose.yml (nginx + agent + redis)
 - [x] .dockerignore
 - [x] Health check endpoint (`GET /health`)
 - [x] Readiness endpoint (`GET /ready`)
@@ -29,8 +29,10 @@ Kết hợp TẤT CẢ những gì đã học trong 1 project hoàn chỉnh.
 │   ├── auth.py         # API Key + JWT
 │   ├── rate_limiter.py # Rate limiting
 │   └── cost_guard.py   # Budget protection
+├── nginx/
+│   └── nginx.conf      # Reverse proxy / load balancer
 ├── Dockerfile          # Multi-stage, production-ready
-├── docker-compose.yml  # Full stack
+├── docker-compose.yml  # Full stack: nginx + agent + redis
 ├── railway.toml        # Deploy Railway
 ├── render.yaml         # Deploy Render
 ├── .env.example        # Template
@@ -50,14 +52,28 @@ cp .env.example .env
 docker compose up
 
 # 3. Test
-curl http://localhost/health
+curl http://localhost:8000/health
 
 # 4. Lấy API key từ .env, test endpoint
 API_KEY=$(grep AGENT_API_KEY .env | cut -d= -f2)
 curl -H "X-API-Key: $API_KEY" \
-     -X POST http://localhost/ask \
+     -X POST http://localhost:8000/ask \
      -H "Content-Type: application/json" \
      -d '{"question": "What is deployment?"}'
+```
+
+## Scale Local Stack
+
+Nginx dung truoc service `agent`, vi vay ban co the scale them instance:
+
+```bash
+docker compose up --scale agent=3
+```
+
+Khi do luong local se la:
+
+```text
+Client -> Nginx -> Agent replicas -> Redis
 ```
 
 ---

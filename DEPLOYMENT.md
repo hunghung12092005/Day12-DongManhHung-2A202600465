@@ -17,6 +17,7 @@ Railway
 - App name: Production AI Agent
 - Environment: production
 - Region: `us-east4`
+- Local production-style stack: `Nginx -> Agent -> Redis`
 
 ## Test Commands
 
@@ -93,6 +94,9 @@ Expected:
 
 - Issue 4: container runtime could not import `uvicorn`.
 - Fix 4: corrected non-root user home setup in the Dockerfile and rebuilt cleanly.
+
+- Issue 5: final local stack did not yet include a reverse proxy/load balancer layer.
+- Fix 5: added an `nginx` service and `nginx.conf` to `06-lab-complete`, so local traffic now flows through Nginx before reaching the agent.
 
 ## Screenshots
 
