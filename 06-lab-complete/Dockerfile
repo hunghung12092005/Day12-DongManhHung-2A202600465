@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 FROM python:3.11-slim AS runtime
 
 # Non-root user
-RUN groupadd -r agent && useradd -r -g agent -d /app agent
+RUN groupadd -r agent && useradd -r -g agent -d /home/agent -m agent
 
 WORKDIR /app
 
@@ -34,6 +34,7 @@ RUN chown -R agent:agent /app
 USER agent
 
 ENV PATH=/home/agent/.local/bin:$PATH
+ENV HOME=/home/agent
 ENV PYTHONPATH=/app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
